@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 const userSchema=new mongoose.Schema({
     name:{
@@ -72,6 +74,32 @@ const userSchema=new mongoose.Schema({
         default: "USER"
     }
 },{timestamps:true})
+
+//yha pr password encrypt krte h
+userSchema.pre("save",async function (next) {
+    if(! this.isModified("password")) return next();
+
+    this.password= await bcrypt.hash(this.password,10)
+    next();
+})
+
+//yha pr user enter password check krte h
+userSchema.methods.isPasswordCorrect=async function (password){
+    return await bcrypt.compare(password,this.password)
+}
+
+userSchema.methods.generateAccessToken = function(){
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    )
+}
 
 const UserModel=mongoose.model("User",userSchema);
 

@@ -1,9 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from 'dotenv';
-dotenv.config({
-    path:"./.env"
-})
+dotenv.config();
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import helmet from 'helmet';
@@ -21,10 +19,17 @@ app.use(helmet({
     crossOriginResourcePolicy:false
 }))
 
+//import Routers 
+import userRouter from "./routes/user.route.js";
+
+
+//use Routers
+app.use("/api/user",userRouter);
 
 app.get("/", (req, res) => {
     res.send("Hello from server!");
 })
+
 
 // Connect to MongoDB
 connectDb()
