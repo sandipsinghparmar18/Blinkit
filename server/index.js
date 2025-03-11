@@ -10,9 +10,10 @@ import connectDb from "./config/connectDb.js";
 const app = express();
 app.use(cors({
     credentials:true,
-    origin:process.env.FRONTEND_URL
+    origin: '*'
 }))
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 //app.use(morgan());
 app.use(helmet({
