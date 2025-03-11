@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import {asyncHandler} from "../utils/asyncHandler.js";
 import verifyEmailTemplate from "../utils/verifyEmailtemplate.js";
 import {generateAccessToken,generateRefreshToken} from "../utils/generateAccessAndRefreshToken.js";
+import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
 
 const registerUser=asyncHandler(async(req,res)=>{
     try {
@@ -120,9 +121,90 @@ const logout=asyncHandler(async(req,res)=>{
         );
 })
 
+const uploadAvatar=asyncHandler(async(req, res)=>{
+    const avatarLocalPath=req.file?.path;
+    if(!avatarLocalPath){
+        throw new ApiError(400, "Avatar file is required");
+    }
+    const avatar=await uploadOnCloudinary(avatarLocalPath);
+    if(!avatar.url){
+        throw new ApiError(500, "Failed to upload avatar to cloudinary");
+    }
+    //take old avatar from db and delete it from cloudinary
+    const existinguser=await UserModel.findById(req.user?._id).select("avatar");
+    const oldavatar=existinguser?.avatar;
+    const deleteResponse=await deleteFromCloudinary(oldavatar);
+    //console.log("deleteResponse",deleteResponse);
+
+    const user=await UserModel.findByIdAndUpdate(
+        req.user._id,
+        {
+            $set:{
+                avatar: avatar.url
+            }
+        },
+        {
+            new: true
+        }
+    ).select("-password -refresh_token")
+
+    return res.status(200).json(
+        new ApiResponse(200, "Avatar uploaded successfully", user)
+    )
+});
+
+const updateUserProfile=asyncHandler(async(req, res)=>{
+    try {
+        const {name,email,mobile}=req.body;
+        if(!name &&!email &&!mobile){
+            throw new ApiError(400, "At least one field is required");
+        }
+        const updateUser=await UserModel.findByIdAndUpdate(
+            req.user?._id,
+            {
+                $set:{
+                    ...(name && {name:name}),
+                    ...(email && {email:email.toLowerCase()}),
+                    ...(mobile && {mobile:mobile})
+                }
+            },
+            {
+                new: true
+            }
+        )
+        return res.status(200).json(
+            new ApiResponse(200, "User profile updated successfully", updateUser)
+        )
+    } catch (error) {
+        throw new ApiError(500,error.message || "Inernal server error");
+    }
+})
+
+const chnangePassword=asyncHandler(async(req,res)=>{
+    const {oldPassword,newPassword}=req.body;
+    const user=await UserModel.findById(req.user?._id);
+    if(!user){
+        throw new ApiError(404, "User not found");
+    }
+    const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
+    if(!isPasswordCorrect){
+        throw new ApiError(401, "Invalid old password");
+    }
+    user.password = newPassword;
+    await user.save({validateBeforeSave:false});
+    return res.status(200).json(
+        new ApiResponse(200, "Password changed successfully")
+    )
+})
+
+
+
 export{
     registerUser,
     verifyEmail,
     login,
-    logout
+    logout,
+    uploadAvatar,
+    updateUserProfile,
+    chnangePassword
 }
