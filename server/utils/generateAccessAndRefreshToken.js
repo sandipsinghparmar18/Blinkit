@@ -3,7 +3,7 @@ import UserModel from "../models/user.model.js";
 
 const generateAccessToken = async(userId)=>{
     const token= await jwt.sign(
-        { userId },
+        { _id:userId },
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
     )
@@ -12,7 +12,7 @@ const generateAccessToken = async(userId)=>{
 
 const generateRefreshToken = async(userId)=>{
     const token= await jwt.sign(
-        { userId },
+        { _id:userId },
         process.env.REFRESH_TOKEN_SECRET,
         { expiresIn: process.env.REFRESH_TOKEN_EXPIRY }
     )

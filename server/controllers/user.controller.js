@@ -96,11 +96,33 @@ const login=asyncHandler(async(req,res)=>{
         .json(
             new ApiResponse(200, "User logged in successfully",{refreshToken,accessToken})
         );
-    
 });
+
+const logout=asyncHandler(async(req,res)=>{
+    if(!req.user){
+        throw new ApiError(401, "User is not logged in");
+    }
+    await UserModel.findByIdAndUpdate(req.user._id,{
+        $unset:{refresh_token:""}
+    });
+
+    const options={
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production'? 'None' : 'Lax'
+    };
+    return res
+        .status(200)
+        .clearCookie('refreshToken', options)
+        .clearCookie('accessToken', options)
+        .json(
+            new ApiResponse(200, "User logged out successfully")
+        );
+})
 
 export{
     registerUser,
     verifyEmail,
-    login
+    login,
+    logout
 }
