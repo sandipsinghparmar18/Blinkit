@@ -6,7 +6,11 @@ import {
     logout,
     uploadAvatar,
     updateUserProfile,
-    chnangePassword
+    chnangePassword,
+    forgotPassword,
+    verifyForgotPasswordOtp,
+    resetPassword,
+    refreshToken
 } from "../controllers/user.controller.js"
 import {auth} from "../middleware/auth.middleware.js";
 import {upload} from "../middleware/multer.middleware.js"
@@ -20,6 +24,10 @@ userRouter.post('/logout',auth,logout);
 userRouter.put('/upload-avatar',auth,upload.single("avatar"),uploadAvatar);
 userRouter.patch('/update-profile',auth,updateUserProfile);
 userRouter.patch('/change-password',auth,chnangePassword);
+userRouter.put("/forgot-password",forgotPassword)
+userRouter.put("/verify-forgot-password-otp",verifyForgotPasswordOtp);
+userRouter.put("/reset-password",resetPassword);
+userRouter.get("/refresh-token",auth,refreshToken);
 
 
 export default userRouter; 

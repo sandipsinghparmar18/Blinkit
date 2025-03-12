@@ -6,6 +6,9 @@ import {asyncHandler} from "../utils/asyncHandler.js";
 import verifyEmailTemplate from "../utils/verifyEmailtemplate.js";
 import {generateAccessToken,generateRefreshToken} from "../utils/generateAccessAndRefreshToken.js";
 import { deleteFromCloudinary, uploadOnCloudinary } from "../utils/cloudinary.js";
+import generateOtp from "../utils/generateOtp.js";
+import forgotPasswordTemp from "../utils/forgotPasswordtemp.js"
+import jwt from "jsonwebtoken"
 
 const registerUser=asyncHandler(async(req,res)=>{
     try {
@@ -197,7 +200,119 @@ const chnangePassword=asyncHandler(async(req,res)=>{
     )
 })
 
+const forgotPassword=asyncHandler(async(req,res)=>{
+    try {
+        const {email}=req.body;
+        if(!email){
+            throw new ApiError(400, "Email is required");
+        }
+        const user=await UserModel.findOne({email:email.toLowerCase()});
+        if(!user){
+            throw new ApiError(404, "User not found");
+        }
+        const otp=generateOtp();
+        const expireTime=new Date(Date.now() + 60 * 60 * 1000);// 1hour
+        user.forgot_password_otp=otp;
+        user.forgot_password_expiry=expireTime.toISOString();
+        await user.save({validateBeforeSave:false});
 
+        await sendEmail({
+            sendTo:email.toLowerCase(),
+            subject:"Reset Password",
+            html:forgotPasswordTemp({
+                name: user.name,
+                otp,
+                expireTime
+            })
+        })
+    
+        return res.status(200).json(
+            new ApiResponse(200, "Password reset link sent to your email")
+        )
+    } catch (error) {
+        throw new ApiError(500, error.message || "Internal server error");
+    }
+});
+
+const verifyForgotPasswordOtp=asyncHandler(async(req,res)=>{
+    try {
+        const {email, otp}=req.body;
+        if(!email ||!otp){
+            throw new ApiError(400, "Code and OTP are required");
+        }
+        const user=await UserModel.findOne({email:email.toLowerCase()});
+        if(!user){
+            throw new ApiError(404, "User not found");
+        }
+        if(user.forgot_password_expiry < new Date().toISOString()){
+            throw new ApiError(401, "OTP expired");
+        }
+        if(user.forgot_password_otp !== otp){
+            throw new ApiError(401, "Invalid OTP");
+        }
+        user.forgot_password_otp=null;
+        user.forgot_password_expiry=null;
+        await user.save({validateBeforeSave:false});
+        return res.status(200).json(
+            new ApiResponse(200, "otp verify successfully")
+        )
+        
+    } catch (error) {
+        throw new ApiError(500, error.message || "Internal server error");
+    }
+})
+
+const resetPassword=asyncHandler(async(req,res)=>{
+    try {
+        const {email, newPassword}=req.body;
+        if(!email ||!newPassword){
+            throw new ApiError(400, "Email and new password are required");
+        }
+        const user=await UserModel.findOne({email:email.toLowerCase()});
+        if(!user){
+            throw new ApiError(404, "User not found");
+        }
+        user.password=newPassword;
+        await user.save({validateBeforeSave:false});
+        return res.status(200).json(
+            new ApiResponse(200, "Password reset successful")
+        )
+    } catch (error) {
+        throw new ApiError(500, error.message || "Internal server error");
+    }
+})
+
+const refreshToken=asyncHandler(async(req,res)=>{
+    try {
+        const refreshToken=req.cookies.refreshToken || req.headers.authorization?.split(" ")[1];
+        if(!refreshToken){
+            throw new ApiError(401, "Refresh token is required");
+        }
+        const data=jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+
+        const user=await UserModel.findById(data._id);
+        if(!user){
+            throw new ApiError(404, "User not found");
+        }
+        const accessToken=await generateAccessToken(user._id);
+        const cookieOption={
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production'? 'None' : 'Lax'
+        }
+        return res
+            .status(200)
+            .cookie('accessToken', accessToken, cookieOption)
+            .json(
+            new ApiResponse(200, "User logged in successfully",{accessToken})
+        )
+    } catch (error) {
+        if(error.name === "TokenExpiredError"){
+            throw new ApiError(401, "Refresh token expired");
+        }
+        throw new ApiError(500, error.message || "Internal server error");
+    }
+})
 
 export{
     registerUser,
@@ -206,5 +321,9 @@ export{
     logout,
     uploadAvatar,
     updateUserProfile,
-    chnangePassword
+    chnangePassword,
+    forgotPassword,
+    verifyForgotPasswordOtp,
+    resetPassword,
+    refreshToken
 }
