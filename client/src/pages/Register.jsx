@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaEyeSlash } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa";
 import { useToast } from "../context/ToastContext";
-import axios from "axios";
+import Axios from "../utils/Axios";
 import { Link, useNavigate } from "react-router-dom";
 
 function Register() {
@@ -27,16 +27,12 @@ function Register() {
       return;
     }
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_BASEURL}/api/user/register`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await Axios.post(`/api/user/register`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
       addToast("Registration successful! You can now login.", "success");
       setData({
         name: "",

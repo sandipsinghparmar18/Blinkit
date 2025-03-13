@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaEyeSlash } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa";
 import { useToast } from "../context/ToastContext";
-import axios from "axios";
+import Axios from "../utils/Axios";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function OtpVerify() {
@@ -23,10 +23,8 @@ function OtpVerify() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(
-        `${
-          import.meta.env.VITE_BACKEND_BASEURL
-        }/api/user/verify-forgot-password-otp`,
+      const response = await Axios.put(
+        `/api/user/verify-forgot-password-otp`,
         {
           otp: data.join(""),
           email: location?.state?.email,

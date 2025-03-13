@@ -3,7 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaEyeSlash } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa";
 import { useToast } from "../context/ToastContext";
-import axios from "axios";
+import Axios from "../utils/Axios";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -34,16 +34,12 @@ function ResetPassword() {
       return;
     }
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_BACKEND_BASEURL}/api/user/reset-password`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await Axios.put(`/api/user/reset-password`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
       addToast("Password reset Successfully", "success");
       navigate("/login");
       setData({

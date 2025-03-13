@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaEyeSlash } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa";
 import { useToast } from "../context/ToastContext";
-import axios from "axios";
+import Axios from "../utils/Axios";
 import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
@@ -21,17 +21,15 @@ function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_BASEURL}/api/user/login`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await Axios.post(`/api/user/login`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
       addToast("Login Successfully", "success");
+      localStorage.setItem("accessToken", response.data.message.accessToken);
+      localStorage.setItem("refreshToken", response.data.message.refreshToken);
       setData({
         email: "",
         password: "",

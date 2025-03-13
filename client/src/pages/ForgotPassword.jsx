@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { FaEyeSlash } from "react-icons/fa6";
 import { FaRegEye } from "react-icons/fa";
 import { useToast } from "../context/ToastContext";
-import axios from "axios";
+import Axios from "../utils/Axios";
 import { Link, useNavigate } from "react-router-dom";
 
 function ForgotPassword() {
@@ -19,16 +19,12 @@ function ForgotPassword() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.put(
-        `${import.meta.env.VITE_BACKEND_BASEURL}/api/user/forgot-password`,
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
-        }
-      );
+      const response = await Axios.put(`/api/user/forgot-password`, data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
       addToast("Send otp to mail Successfully", "success");
       navigate("/verify-otp", {
         state: data,
