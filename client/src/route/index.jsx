@@ -7,6 +7,11 @@ import Register from "../pages/register";
 import ForgotPassword from "../pages/ForgotPassword";
 import OtpVerify from "../pages/OtpVerify";
 import ResetPassword from "../pages/ResetPassword";
+import UserMunuMobile from "../pages/UserMunuMobile";
+import Dashboard from "../layouts/Dashboard";
+import Profile from "../pages/Profile";
+import Myorder from "../pages/Myorder";
+import Address from "../pages/Address";
 
 const router = createBrowserRouter([
   {
@@ -22,24 +27,46 @@ const router = createBrowserRouter([
         element: <SearchPage />,
       },
       {
-        path: "/login",
+        path: "login",
         element: <Login />,
       },
       {
-        path: "/register",
+        path: "register",
         element: <Register />,
       },
       {
-        path: "/forgot-password",
+        path: "forgot-password",
         element: <ForgotPassword />,
       },
       {
-        path: "/verify-otp",
+        path: "verify-otp",
         element: <OtpVerify />,
       },
       {
-        path: "/reset-password",
+        path: "reset-password",
         element: <ResetPassword />,
+      },
+      {
+        path: "user",
+        element: <UserMunuMobile />,
+      },
+      {
+        path: "dashboard",
+        element: <Dashboard />,
+        children: [
+          {
+            path: "profile",
+            element: <Profile />,
+          },
+          {
+            path: "myorders",
+            element: <Myorder />,
+          },
+          {
+            path: "address",
+            element: <Address />,
+          },
+        ],
       },
     ],
   },

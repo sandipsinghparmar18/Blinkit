@@ -4,9 +4,14 @@ import { FaRegEye } from "react-icons/fa";
 import { useToast } from "../context/ToastContext";
 import Axios from "../utils/Axios";
 import { Link, useNavigate } from "react-router-dom";
+import fetchUserDetails from "../utils/fetchUserDetails";
+import { useDispatch } from "react-redux";
+import { setUserDetails } from "../store/userSlice";
 
 function Login() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const { addToast } = useToast();
   const [data, setData] = useState({
     email: "",
@@ -25,11 +30,12 @@ function Login() {
         headers: {
           "Content-Type": "application/json",
         },
-        withCredentials: true,
       });
       addToast("Login Successfully", "success");
       localStorage.setItem("accessToken", response.data.message.accessToken);
       localStorage.setItem("refreshToken", response.data.message.refreshToken);
+      const userDetails = await fetchUserDetails();
+      dispatch(setUserDetails(userDetails.data.message));
       setData({
         email: "",
         password: "",

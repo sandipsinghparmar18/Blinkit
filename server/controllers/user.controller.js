@@ -89,6 +89,9 @@ const login = asyncHandler(async (req, res) => {
   if (!isPasswordValid) {
     throw new ApiError(401, "Invalid username or password");
   }
+  const updateUser = await UserModel.findByIdAndUpdate(user?._id, {
+    last_login_date: new Date(),
+  });
   const accessToken = await generateAccessToken(user._id);
   const refreshToken = await generateRefreshToken(user._id);
   const cookieOption = {
@@ -323,6 +326,20 @@ const refreshToken = asyncHandler(async (req, res) => {
   }
 });
 
+const userDetails = asyncHandler(async (req, res) => {
+  try {
+    const user = await UserModel.findById(req.user?._id).select(
+      "-password -refresh_token"
+    );
+    if (!user) {
+      throw new ApiError(404, "User not found");
+    }
+    return res.status(200).json(new ApiResponse(200, "User details", user));
+  } catch (error) {
+    throw new ApiError(500, error.message || "Internal server error");
+  }
+});
+
 export {
   registerUser,
   verifyEmail,
@@ -335,4 +352,5 @@ export {
   verifyForgotPasswordOtp,
   resetPassword,
   refreshToken,
+  userDetails,
 };

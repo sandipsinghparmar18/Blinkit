@@ -1,63 +1,68 @@
 import axios from "axios";
-import {
-  getAccessToken,
-  getRefreshToken,
-  setAccessToken,
-  logoutUser,
-} from "../store/authService.js";
 
 const Axios = axios.create({
-  baseURL: import.meta.env.VITE_BACKEND_BASEURL, // Your API base URL
-  withCredentials: true, // To send cookies
+  baseURL: import.meta.env.VITE_BACKEND_BASEURL,
+  withCredentials: true, // Ensure cookies are sent
 });
 
-// Add a request interceptor
+//sending access token in the header
 Axios.interceptors.request.use(
   async (config) => {
-    const accessToken = getAccessToken(); // Get current access token
+    const accessToken = localStorage.getItem("accesstoken");
+
     if (accessToken) {
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
+      config.headers.Authorization = `Bearer ${accessToken}`;
     }
+
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => {
+    return Promise.reject(error);
+  }
 );
 
-// Add a response interceptor
-Axios.interceptors.response.use(
-  (response) => response, // Return response if successful
+//extend the life span of access token with
+// the help refresh
+Axios.interceptors.request.use(
+  (response) => {
+    return response;
+  },
   async (error) => {
-    const originalRequest = error.config;
+    let originRequest = error.config;
 
-    // If the response is 401 (Unauthorized) and it's not a retry request
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true; // Prevent infinite loops
+    if (error.response.status === 401 && !originRequest.retry) {
+      originRequest.retry = true;
 
-      try {
-        // Get refresh token and request a new access token
-        const refreshToken = getRefreshToken();
-        const { data } = await axios.get(
-          `${import.meta.env.VITE_BACKEND_BASEURL}/api/user/refresh-token`,
-          { refreshToken },
-          { withCredentials: true }
-        );
+      const refreshToken = localStorage.getItem("refreshToken");
 
-        setAccessToken(data.message.accessToken); // Save new access token
-        originalRequest.headers[
-          "Authorization"
-        ] = `Bearer ${data.message.accessToken}`;
+      if (refreshToken) {
+        const newAccessToken = await refreshAccessToken(refreshToken);
 
-        // Retry the original request with the new token
-        return Axios(originalRequest);
-      } catch (err) {
-        console.error("Refresh token expired:", err);
-        logoutUser(); // Clear tokens and redirect to login
-        return Promise.reject(err);
+        if (newAccessToken) {
+          originRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          return Axios(originRequest);
+        }
       }
     }
 
     return Promise.reject(error);
   }
 );
+
+const refreshAccessToken = async (refreshToken) => {
+  try {
+    const response = await Axios.get(`/api/user/refresh-token`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const accessToken = response.data.message.accessToken;
+    localStorage.setItem("accesstoken", accessToken);
+    return accessToken;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export default Axios;
