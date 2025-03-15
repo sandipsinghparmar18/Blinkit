@@ -46,21 +46,30 @@ function Profile() {
     }
   };
   return (
-    <div>
+    <div className="xl:px-4 lg:py-4">
       {/* update avatar */}
-      <div className="w-20 h-20 bg-red-300 flex items-center justify-center  rounded-full overflow-hidden drop-shadow-md">
-        {user.avatar ? (
-          <img src={user.avatar} alt="User Profile" className="w-full h-full" />
-        ) : (
-          <FaRegUserCircle size={65} />
-        )}
+      <div className="flex items-center justify-center">
+        <div>
+          <div className="w-25 h-25 bg-red-300 flex items-center justify-center  rounded-full overflow-hidden drop-shadow-md">
+            {user.avatar ? (
+              <img
+                src={user.avatar}
+                alt="User Profile"
+                className="w-full h-full"
+              />
+            ) : (
+              <FaRegUserCircle size={65} />
+            )}
+          </div>
+          <button
+            onClick={() => setOpenAvatarUpdate(true)}
+            className="text-sm min-w-20 border border-yellow-400 ml-3 px-3 py-1 rounded-full mt-3 cursor-pointer hover:bg-yellow-400"
+          >
+            Edit
+          </button>
+        </div>
       </div>
-      <button
-        onClick={() => setOpenAvatarUpdate(true)}
-        className="text-sm min-w-20 border border-yellow-400 px-3 py-1 rounded-full mt-3 cursor-pointer hover:bg-yellow-400"
-      >
-        Edit
-      </button>
+
       {openAvatarUpdate && (
         <UpdateAvatar close={() => setOpenAvatarUpdate(false)} />
       )}

@@ -37,7 +37,7 @@ function UserMenu({ close }) {
     }
   };
   return (
-    <div>
+    <div className=" lg:pl-4">
       <div className="font-semibold">My Account</div>
       <div className="text-sm flex items-center gap-2">
         <span className="max-w-52 text-ellipsis line-clamp-1">

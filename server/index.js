@@ -28,9 +28,11 @@ app.use(
 
 //import Routers
 import userRouter from "./routes/user.route.js";
+import categoryRoute from "./routes/category.route.js";
 
 //use Routers
 app.use("/api/user", userRouter);
+app.use("/api/category", categoryRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello from server!");

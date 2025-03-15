@@ -1,12 +1,13 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useToast } from "../context/ToastContext";
 import Axios from "../utils/Axios";
 
-function UploadCategoryModel({ close, fetchData }) {
+function EditCategory({ close, fetchData, data: categoryData }) {
   const [data, setData] = useState({
-    name: "",
-    image: "",
+    name: categoryData.name,
+    image: categoryData.image,
+    id: categoryData._id,
   });
   const { addToast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -24,10 +25,14 @@ function UploadCategoryModel({ close, fetchData }) {
     formData.append("name", data.name);
     try {
       setLoading(true);
-      const response = await Axios.post("/api/category/addCategory", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      addToast("Category added successfully.", "success");
+      const response = await Axios.put(
+        `/api/category/update/${data.id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      addToast("Category updated successfully.", "success");
       setLoading(false);
       close();
       fetchData();
@@ -40,7 +45,7 @@ function UploadCategoryModel({ close, fetchData }) {
     <section className="fixed top-0 bottom-0 left-0 right-0 p-4 bg-neutral-800/60 flex items-center justify-center">
       <div className="bg-white max-w-4xl w-full p-4 rounded">
         <div className="flex items-center justify-between">
-          <h1 className="font-semibold">Category</h1>
+          <h1 className="font-semibold">Update Category</h1>
           <button className="w-fit block ml-auto cursor-pointer">
             <IoMdClose size={24} onClick={close} />
           </button>
@@ -96,15 +101,15 @@ function UploadCategoryModel({ close, fetchData }) {
           <button
             type="submit"
             className={`
-              ${
-                data.name && data.image
-                  ? "bg-yellow-400 hover:bg-amber-400"
-                  : "bg-gray-300"
-              }
-              py-2 rounded font-semibold  
-            `}
+                  ${
+                    data.name && data.image
+                      ? "bg-yellow-400 hover:bg-amber-400"
+                      : "bg-gray-300"
+                  }
+                  py-2 rounded font-semibold  
+                `}
           >
-            Add Category
+            Update Category
           </button>
         </form>
       </div>
@@ -112,4 +117,4 @@ function UploadCategoryModel({ close, fetchData }) {
   );
 }
 
-export default UploadCategoryModel;
+export default EditCategory;

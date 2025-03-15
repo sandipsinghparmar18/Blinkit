@@ -30,9 +30,9 @@ function Header() {
     navigate("/login");
   };
   return (
-    <header className="h-24 lg:h-20 lg:shadow-md sticky top-0 flex flex-col justify-center gap-1 bg-white">
+    <header className="h-24 lg:h-20 lg:shadow-md xl:h-20 xl:shadow-md sticky top-0 z-40 flex flex-col justify-center gap-1 bg-white">
       {!(isSearchPage && isMobile) && (
-        <div className=" container mx-auto flex items-center px-2 justify-between">
+        <div className=" container mx-auto flex items-center px-2 justify-between xl:px-5">
           {/* Logo */}
           <Link className="h-full">
             <div className="h-full flex justify-center items-center">
@@ -41,14 +41,14 @@ function Header() {
                 alt="logo"
                 width={170}
                 height={60}
-                className="hidden lg:block"
+                className="hidden lg:block xl:block"
               />
               <img
                 src={logo}
                 alt="logo"
                 width={120}
                 height={60}
-                className="lg:hidden"
+                className="lg:hidden xl:hidden"
               />
             </div>
           </Link>
@@ -60,13 +60,13 @@ function Header() {
           <div>
             {/* for mobile version */}
             <button
-              className="text-neutral-600 cursor-pointer lg:hidden"
+              className="text-neutral-600 cursor-pointer lg:hidden xl:hidden"
               onClick={handleMobileUser}
             >
               <FaRegCircleUser size={26} />
             </button>
             {/* for desktop version */}
-            <div className="hidden lg:flex items-center gap-10">
+            <div className="hidden lg:flex xl:flex items-center gap-10">
               {user?._id ? (
                 <div className=" relative">
                   <div
@@ -82,7 +82,7 @@ function Header() {
                   </div>
                   {openUserMenu && (
                     <div className=" absolute right-0 top-13">
-                      <div className="bg-white rounded p-4 min-w-52 lg:shadow-lg">
+                      <div className="bg-white rounded p-4 min-w-52 lg:shadow-lg xl:shadow-lg">
                         <UserMenu close={handleCloseUserMenu} />
                       </div>
                     </div>

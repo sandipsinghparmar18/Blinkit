@@ -5,9 +5,9 @@ import { Outlet } from "react-router-dom";
 function Dashboard() {
   return (
     <section className="bg-white">
-      <div className="container mx-auto p-3 grid lg:grid-cols-[250px_1fr]">
+      <div className="container mx-auto p-3 grid lg:grid-cols-[250px_1fr] xl:grid-cols-[300px_1fr]">
         {/** Left for menu */}
-        <div className="py-4 sticky top-24 overflow-y-auto hidden lg:block border-r">
+        <div className="py-4 sticky top-24 max-h-[calc(100vh-96px)] overflow-y-auto hidden lg:block xl:block border-r">
           <UserMenu />
         </div>
 
