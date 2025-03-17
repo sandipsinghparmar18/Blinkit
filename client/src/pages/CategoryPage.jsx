@@ -6,6 +6,7 @@ import Axios from "../utils/Axios";
 import EditCategory from "../components/EditCategory";
 import ConformBox from "../components/ConformBox";
 import { useToast } from "../context/ToastContext";
+import { useSelector } from "react-redux";
 
 function CategoryPage() {
   const { addToast } = useToast();
@@ -22,6 +23,10 @@ function CategoryPage() {
   const [deleteCategory, setDeleteCategory] = useState({
     _id: "",
   });
+  // const allCategory = useSelector((state) => state.product.allCategory);
+  // useEffect(() => {
+  //   setCategoryData(allCategory);
+  // }, [allCategory]);
   const fetchCategry = async () => {
     try {
       setLoading(true);
@@ -62,7 +67,7 @@ function CategoryPage() {
         </button>
       </div>
       {!categoryData[0] && !loading && <NoData />}
-      <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-2">
+      <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 gap-2">
         {categoryData.map((category, index) => {
           return (
             <div key={category._id} className="w-32 h-56 rounded shadow-md">

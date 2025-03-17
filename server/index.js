@@ -29,10 +29,12 @@ app.use(
 //import Routers
 import userRouter from "./routes/user.route.js";
 import categoryRoute from "./routes/category.route.js";
+import subCategoryRoute from "./routes/subCategory.route.js";
 
 //use Routers
 app.use("/api/user", userRouter);
 app.use("/api/category", categoryRoute);
+app.use("/api/subcategory", subCategoryRoute);
 
 app.get("/", (req, res) => {
   res.send("Hello from server!");

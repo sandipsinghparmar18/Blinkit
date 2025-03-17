@@ -13,6 +13,12 @@ function UploadCategoryModel({ close, fetchData }) {
   const handleOnChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setData({ ...data, image: file });
+    }
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!data.name || !data.image) {
@@ -85,9 +91,7 @@ function UploadCategoryModel({ close, fetchData }) {
                   id="uploadCategoryImage"
                   accept="image/*"
                   name="image"
-                  onChange={(e) =>
-                    setData({ ...data, image: e.target.files[0] })
-                  }
+                  onChange={handleImageChange}
                   className="hidden"
                 />
               </label>

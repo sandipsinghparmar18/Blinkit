@@ -46,7 +46,7 @@ function Profile() {
     }
   };
   return (
-    <div className="xl:px-4 lg:py-4">
+    <div className="p-4">
       {/* update avatar */}
       <div className="flex items-center justify-center">
         <div>
