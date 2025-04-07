@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import SubCategoryModel from "../models/subCategory.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -95,4 +96,25 @@ const updateSubCategory = asyncHandler(async (req, res) => {
     );
 });
 
-export { addSubCategory, getSubCategories, updateSubCategory };
+const deleteSubCategory = asyncHandler(async (req, res) => {
+  try {
+    const _id = req.params;
+    const subCategory = await SubCategoryModel.findById(_id);
+    if (!subCategory) {
+      throw new ApiError(400, "Can't Find subCategory");
+    }
+    await SubCategoryModel.findByIdAndDelete(_id);
+    return res
+      .status(200)
+      .json(new ApiResponse(200, {}, "Delete Successfully"));
+  } catch (error) {
+    throw new ApiError(500, error.message || "Internal Server Error");
+  }
+});
+
+export {
+  addSubCategory,
+  getSubCategories,
+  updateSubCategory,
+  deleteSubCategory,
+};

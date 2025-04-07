@@ -3,6 +3,7 @@ import { auth } from "../middleware/auth.middleware.js";
 import { upload } from "../middleware/multer.middleware.js";
 import {
   addSubCategory,
+  deleteSubCategory,
   getSubCategories,
   updateSubCategory,
 } from "../controllers/subCategory.controller.js";
@@ -17,5 +18,6 @@ subCategoryRoute.put(
   upload.single("image"),
   updateSubCategory
 );
+subCategoryRoute.delete("/delete/:_id", deleteSubCategory);
 
 export default subCategoryRoute;

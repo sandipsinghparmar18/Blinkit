@@ -69,7 +69,11 @@ function EditCategory({ close, fetchData, data: categoryData }) {
               <div className="border bg-blue-50 h-36 w-full lg:w-36 flex items-center justify-center rounded">
                 {data.image ? (
                   <img
-                    src={data.image}
+                    src={
+                      typeof data.image === "string"
+                        ? data.image
+                        : URL.createObjectURL(data.image)
+                    }
                     alt="Category"
                     className="w-full h-full object-scale-down"
                   />

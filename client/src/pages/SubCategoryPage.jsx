@@ -7,6 +7,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import EditSubCategory from "../components/EditSubCategory";
+import ConformBox from "../components/ConformBox";
 
 function SubCategoryPage() {
   const { addToast } = useToast();
@@ -18,6 +19,23 @@ function SubCategoryPage() {
   const [editSubData, setEditSubData] = useState({
     _id: "",
   });
+  const [deleteSubCategory, setDeleteSubCategory] = useState({
+    _id: "",
+  });
+  const [openDeteteConfirm, setOpenDeleteConfirm] = useState(false);
+  const handleDeleteSubCategory = async () => {
+    try {
+      const response = await Axios.delete(
+        `api/subcategory/delete/${deleteSubCategory._id}`
+      );
+      addToast("Successfully delete Category");
+      setOpenDeleteConfirm(false);
+      fetchsubcategory();
+    } catch (error) {
+      addToast("Error in Delete SubCategory", "error");
+      console.error(error.message);
+    }
+  };
   const columnHelper = createColumnHelper();
   let column = [
     columnHelper.accessor("name", {
@@ -73,7 +91,13 @@ function SubCategoryPage() {
             >
               <MdEdit size={20} />
             </button>
-            <button className="p-2 bg-red-100 rounded-full text-red-500 hover:text-red-600 cursor-pointer">
+            <button
+              onClick={() => {
+                setOpenDeleteConfirm(true);
+                setDeleteSubCategory(row.original);
+              }}
+              className="p-2 bg-red-100 rounded-full text-red-500 hover:text-red-600 cursor-pointer"
+            >
               <MdDelete size={20} />
             </button>
           </div>
@@ -112,7 +136,10 @@ function SubCategoryPage() {
         <DisplayTable data={data} column={column} />
       </div>
       {openAddSubCategory && (
-        <UploadSubCategory close={() => setOpenAddSubCategory(false)} />
+        <UploadSubCategory
+          close={() => setOpenAddSubCategory(false)}
+          fetchData={fetchsubcategory}
+        />
       )}
       {imageUrl && <ViewImage url={imageUrl} close={() => setImageurl("")} />}
       {openEditSubCategory && (
@@ -120,6 +147,12 @@ function SubCategoryPage() {
           data={editSubData}
           close={() => setOpenEditSubCategory(false)}
           fetchData={fetchsubcategory}
+        />
+      )}
+      {openDeteteConfirm && (
+        <ConformBox
+          close={() => setOpenDeleteConfirm(false)}
+          confirm={handleDeleteSubCategory}
         />
       )}
     </section>

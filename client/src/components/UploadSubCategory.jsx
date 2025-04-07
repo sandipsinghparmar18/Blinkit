@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import { useToast } from "../context/ToastContext";
 import Axios from "../utils/Axios";
 
-function UploadSubCategory({ close }) {
+function UploadSubCategory({ close, fetchData }) {
   const { addToast } = useToast();
   const [data, setData] = useState({
     name: "",
@@ -49,8 +49,7 @@ function UploadSubCategory({ close }) {
           "Content-Type": "multipart/form-data",
         },
       });
-
-      console.log(response.data);
+      fetchData();
       addToast("Subcategory uploaded successfully", "success");
       close();
     } catch (error) {
@@ -91,7 +90,11 @@ function UploadSubCategory({ close }) {
                   <p className=" text-sm text-neutral-400">No Image</p>
                 ) : (
                   <img
-                    src={data.image}
+                    src={
+                      typeof data.image === "string"
+                        ? data.image
+                        : URL.createObjectURL(data.image)
+                    }
                     alt="Sub Category"
                     className="w-full h-full object-scale-down"
                   />
