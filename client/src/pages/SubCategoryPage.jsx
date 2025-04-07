@@ -30,6 +30,7 @@ function SubCategoryPage() {
       );
       addToast("Successfully delete Category");
       setOpenDeleteConfirm(false);
+      setDeleteSubCategory({ _id: "" });
       fetchsubcategory();
     } catch (error) {
       addToast("Error in Delete SubCategory", "error");
@@ -132,7 +133,7 @@ function SubCategoryPage() {
           Add SubCategory
         </button>
       </div>
-      <div>
+      <div className=" overflow-auto w-full max-w-[95vw]">
         <DisplayTable data={data} column={column} />
       </div>
       {openAddSubCategory && (
